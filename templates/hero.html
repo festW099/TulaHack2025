@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Память о герое - {{ data.full_name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/sample.css">
+    <style>
+        #map { 
+            height: 400px; 
+            margin-bottom: 20px; 
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .birth-marker { 
+            background-color: #10B981; 
+            border-radius: 50%; 
+            border: 2px solid white;
+        }
+        .battle-marker { 
+            background-color: #EF4444; 
+            border-radius: 50%; 
+            border: 2px solid white;
+        }
+        .map-error { 
+            padding: 20px; 
+            color: #EF4444; 
+            background: #FEE2E2; 
+            border-radius: 0.5rem;
+        }
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .photo-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease;
+        }
+        .photo-item img:hover {
+            transform: scale(1.03);
+        }
+        .letter-content img {
+            max-width: 100%;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            background-color: #3B82F6;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -1px;
+        }
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+            box-sizing: border-box;
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background-color: white;
+            border: 3px solid #3B82F6;
+            border-radius: 50%;
+            top: 15px;
+            z-index: 1;
+        }
+        .left {
+            left: 0;
+        }
+        .right {
+            left: 50%;
+        }
+        .left::after {
+            right: -8px;
+        }
+        .right::after {
+            left: -8px;
+        }
+        .timeline-content {
+            padding: 20px;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        header{
+            color: white;
+        }
+    </style>
+</head>
+<header class="py-6 px-4 md:px-12 bg-blue-900 bg-opacity-80 fixed w-full z-50">
+    <div class="container mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <div class="history-icon bg-blue-700 p-3 rounded-full">
+                <i class="fas fa-shield-alt text-3xl text-blue-100"></i>
+            </div>
+            <h1 class="text-xl md:text-2xl font-bold">Герои российских войн</h1>
+        </div>
+        <nav class="hidden md:block">
+            <ul class="flex space-x-8">
+                <li><a href="/" class="nav-link hover:text-blue-200 font-medium">Главная</a></li>
+                <li><a href="/create" class="nav-link hover:text-blue-200 font-medium">Добавить героя</a></li>
+                <li><a href="/remember" class="nav-link hover:text-blue-200 font-medium">Мы помним</a></li>
+                {% if user %}
+                <li><a href="#" class="nav-link hover:text-blue-200 font-medium">{{ user['username'] }}</a></li>
+                <li><a href="{{ url_for('logout') }}" class="nav-link hover:text-blue-200 font-medium">Выйти</a></li>
+                {% else %}
+                <li><a href="{{ url_for('login') }}" class="nav-link hover:text-blue-200 font-medium">Войти</a></li>
+                <li><a href="{{ url_for('register') }}" class="nav-link hover:text-blue-200 font-medium">Регистрация</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        <button class="md:hidden text-2xl">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+</header>
+<body class="bg-blue-50 min-h-screen">
+    <br> <br> <br> <br> <br> <br>
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <header class="bg-blue-700 text-white rounded-xl p-8 mb-8 shadow-lg">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-bold mb-2">{{ data.full_name }}</h1>
+                    <div class="years text-xl md:text-2xl font-light">
+                        ({{ data.year_start }} - {{ data.year_end }})
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="bg-white rounded-xl p-6 mb-8 shadow">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4 border-b-2 border-blue-200 pb-2">Основная информация</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <div class="mb-4">
+                        <h3 class="text-lg font-semibold text-blue-700">Место рождения</h3>
+                        <p class="text-gray-700">{{ data.born }}</p>
+                    </div>
+                    <div id="birth-coords" data-lat="{{ data.born_latitude }}" data-lng="{{ data.born_longitude }}"></div>
+                </div>
+                <div>
+                    <div class="bg-blue-100 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-blue-700 mb-2">Краткая биография</h3>
+                        <p class="text-gray-700">{% if data.battles %}{{ data.battles }}{% else %}Информация о жизни героя будет добавлена позже.{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl p-6 mb-8 shadow">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4 border-b-2 border-blue-200 pb-2">Награды</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for award in data.awards %}
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center">
+                    <div class="bg-blue-100 p-2 rounded-full mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m8-8v7m-16-7v7m8-12l4 4-4 4-4-4" />
+                        </svg>
+                    </div>
+                    <span class="font-medium text-blue-700">{{ award }}</span>
+                </div>
+                {% endfor %}
+                {% if data.awards|length == 0 %}
+                <div class="col-span-full text-center py-4 text-gray-500">
+                    Информация о наградах будет добавлена позже.
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl p-6 mb-8 shadow">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4 border-b-2 border-blue-200 pb-2">Фотографии</h2>
+            <div class="photo-gallery">
+                {% for photo in data.photos %}
+                <div class="photo-item">
+                    <img src="/static/photos/{{ photo }}" alt="Фото {{ data.full_name }}" class="hover:shadow-lg transition-shadow">
+                </div>
+                {% endfor %}
+                {% if data.photos|length == 0 %}
+                <div class="col-span-full text-center py-8 text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p class="mt-2">Фотографии будут добавлены позже</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl p-6 mb-8 shadow">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4 border-b-2 border-blue-200 pb-2">Боевые действия</h2>
+            
+            <div class="battle-map">
+                <h3 class="text-xl font-semibold text-blue-700 mb-3">Места сражений</h3>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl p-6 mb-8 shadow">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4 border-b-2 border-blue-200 pb-2">Письмо</h2>
+            <div class="letter-content text-center">
+                {% if data.letter %}
+                <img src="/static/{{ data.letter }}" alt="Письмо {{ data.full_name }}" class="mx-auto">
+                {% else %}
+                <div class="py-8 text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <p class="mt-2">Письмо будет добавлено позже</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+    </div>
+
+    <div id="map-data" style="display:none;">{{ map_data|safe }}</div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const mapData = JSON.parse('{{ map_data | safe }}');
+                
+                if (!mapData.birth || typeof mapData.birth.lat !== 'number' || 
+                    typeof mapData.birth.lng !== 'number') {
+                    throw new Error('Invalid birth coordinates');
+                }
+                
+                const map = L.map('map').setView(
+                    [mapData.birth.lat, mapData.birth.lng], 
+                    mapData.battles && mapData.battles.length > 0 ? 5 : 8
+                );
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(map);
+                
+                L.marker([mapData.birth.lat, mapData.birth.lng], {
+                    icon: L.divIcon({
+                        className: 'birth-marker',
+                        iconSize: [16, 16]
+                    })
+                }).addTo(map).bindPopup(`
+                    <div class="font-bold text-blue-800">Место рождения</div>
+                    <div class="text-gray-700">${mapData.birth.locations || 'Не указано'}</div>
+                `);
+                
+                if (Array.isArray(mapData.battles)) {
+                    mapData.battles.forEach((battle, index) => {
+                        if (battle.latitude && battle.longitude) {
+                            L.marker([battle.latitude, battle.longitude], {
+                                icon: L.divIcon({
+                                    className: 'battle-marker',
+                                    iconSize: [16, 16]
+                                })
+                            }).addTo(map).bindPopup(`
+                                <div class="font-bold text-red-800">Место сражения #${index + 1}</div>
+                                <div class="text-gray-700">${battle.description || 'Описание сражения'}</div>
+                            `);
+                        }
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Map initialization error:', error);
+                const mapDiv = document.getElementById('map');
+                if (mapDiv) {
+                    mapDiv.innerHTML = `
+                        <div class="map-error rounded-lg">
+                            <p class="font-bold">Не удалось загрузить карту</p>
+                            <p class="text-sm mt-1">${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

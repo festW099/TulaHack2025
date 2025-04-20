@@ -1,0 +1,188 @@
+{% extends "sample.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<style>
+    body{
+        color: white;
+    }
+</style>
+<section class="pt-32 pb-20 px-4 md:px-12">
+  <div class="container mx-auto flex flex-col md:flex-row items-center">
+      <div class="md:w-1/2 mb-12 md:mb-0">
+          <h2 class="hero-title text-4xl md:text-6xl font-bold mb-6 leading-tight">
+              Герои военной истории России <span class="text-blue-200">с 1700 года</span>
+          </h2>
+          <p class="text-xl mb-8 text-blue-100">
+              От Северной войны до современных конфликтов - память о мужестве и доблести русских воинов
+          </p>
+          <div class="flex space-x-4">
+              <a href="/create" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition duration-300 shadow-lg">
+                  Добавить героя
+              </a>
+              <a href="/remember" class="border-2 border-blue-400 hover:bg-blue-900 hover:bg-opacity-50 text-blue-100 px-8 py-3 rounded-lg font-medium transition duration-300">
+                  Найти героя
+              </a>
+          </div>
+      </div>
+  </div>
+  <div class="text-center mt-20 scroll-down">
+      <a class="text-blue-200 hover:text-white">
+          <i class="fas fa-chevron-down text-3xl"></i>
+      </a>
+  </div>
+</section>
+
+<section id="timeline" class="py-20 px-4 md:px-12 bg-blue-900 bg-opacity-50">
+  <div class="container mx-auto">
+      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center hero-title">Хронология военных событий</h2>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="bg-blue-800 bg-opacity-70 p-6 rounded-xl">
+              <h3 class="text-2xl font-bold mb-4 text-blue-200 flex items-center">
+                  <i class="fas fa-flag mr-3"></i> XVIII век
+              </h3>
+              <div class="timeline">
+                  <div class="timeline-item">
+                      <h4 class="text-xl font-semibold">Северная война (1700-1721)</h4>
+                      <p class="text-blue-100">Пётр I, Фёдор Апраксин, Александр Меншиков</p>
+                  </div>
+                  <div class="timeline-item">
+                      <h4 class="text-xl font-semibold">Семилетняя война (1756-1763)</h4>
+                      <p class="text-blue-100">Пётр Румянцев, Пётр Салтыков</p>
+                  </div>
+                  <div class="timeline-item">
+                      <h4 class="text-xl font-semibold">Русско-турецкие войны</h4>
+                      <p class="text-blue-100">Александр Суворов, Григорий Потёмкин</p>
+                  </div>
+              </div>
+          </div>
+          
+          <div class="bg-blue-800 bg-opacity-70 p-6 rounded-xl">
+              <h3 class="text-2xl font-bold mb-4 text-blue-200 flex items-center">
+                  <i class="fas fa-horse mr-3"></i> XIX век
+              </h3>
+              <div class="timeline">
+                  <div class="timeline-item">
+                      <h4 class="text-xl font-semibold">Отечественная война 1812</h4>
+                      <p class="text-blue-100">Кутузов, Багратион, Барклай-де-Толли</p>
+                  </div>
+                  <div class="timeline-item">
+                      <h4 class="text-xl font-semibold">Крымская война (1853-1856)</h4>
+                      <p class="text-blue-100">Павел Нахимов, Владимир Корнилов</p>
+                  </div>
+                  <div class="timeline-item">
+                      <h4 class="text-xl font-semibold">Русско-турецкая война (1877-1878)</h4>
+                      <p class="text-blue-100">Михаил Скобелев, Иосиф Гурко</p>
+                  </div>
+              </div>
+          </div>
+          
+          <div class="bg-blue-800 bg-opacity-70 p-6 rounded-xl">
+              <h3 class="text-2xl font-bold mb-4 text-blue-200 flex items-center">
+                  <i class="fas fa-tank mr-3"></i> XX век
+              </h3>
+              <div class="timeline">
+                  <div class="timeline-item">
+                      <h4 class="text-xl font-semibold">Первая мировая война</h4>
+                      <p class="text-blue-100">Алексей Брусилов, Николай Юденич</p>
+                  </div>
+                  <div class="timeline-item">
+                      <h4 class="text-xl font-semibold">Великая Отечественная</h4>
+                      <p class="text-blue-100">Жуков, Рокоссовский, Ковпак</p>
+                  </div>
+                  <div class="timeline-item">
+                      <h4 class="text-xl font-semibold">Афганская война</h4>
+                      <p class="text-blue-100">Валерий Востротин, Николай Майданов</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
+
+<section class="py-20 px-4 md:px-12">
+  <div class="container mx-auto">
+      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center hero-title">Герои страны</h2>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="hero-card rounded-xl overflow-hidden shadow-lg">
+              <div class="relative">
+                  <div class="absolute top-4 right-4 bg-blue-800 text-white px-3 py-1 rounded-full text-sm">
+                      XVIII век
+                  </div>
+              </div>
+              <div class="p-6">
+                  <h3 class="text-2xl font-bold mb-2">Пётр I</h3>
+                  <p class="text-blue-200 mb-2">Основатель регулярной армии</p>
+                  <p class="text-sm text-blue-100 mb-4">Победитель в Северной войне, создатель военно-морского флота России</p>
+              </div>
+          </div>
+          
+          <div class="hero-card rounded-xl overflow-hidden shadow-lg">
+              <div class="relative">
+                  <div class="absolute top-4 right-4 bg-blue-800 text-white px-3 py-1 rounded-full text-sm">
+                      XIX век
+                  </div>
+              </div>
+              <div class="p-6">
+                  <h3 class="text-2xl font-bold mb-2">М.И. Кутузов</h3>
+                  <p class="text-blue-200 mb-2">Главнокомандующий в 1812 году</p>
+                  <p class="text-sm text-blue-100 mb-4">Разгромил "Великую армию" Наполеона, спаситель России</p>
+              </div>
+          </div>
+          
+          <div class="hero-card rounded-xl overflow-hidden shadow-lg">
+              <div class="relative">
+                  <div class="absolute top-4 right-4 bg-blue-800 text-white px-3 py-1 rounded-full text-sm">
+                      XX век
+                  </div>
+              </div>
+              <div class="p-6">
+                  <h3 class="text-2xl font-bold mb-2">Г.К. Жуков</h3>
+                  <p class="text-blue-200 mb-2">Маршал Победы</p>
+                  <p class="text-sm text-blue-100 mb-4">Четырежды Герой Советского Союза, один из главных творцов победы в ВОВ</p>
+              </div>
+          </div>
+          
+          <div class="hero-card rounded-xl overflow-hidden shadow-lg">
+              <div class="relative">
+                  <div class="absolute top-4 right-4 bg-blue-800 text-white px-3 py-1 rounded-full text-sm">
+                      XXI век
+                  </div>
+              </div>
+              <div class="p-6">
+                  <h3 class="text-2xl font-bold mb-2">В.Г. Пугачёв</h3>
+                  <p class="text-blue-200 mb-2">Герой России</p>
+                  <p class="text-sm text-blue-100 mb-4">Лётчик-испытатель, Герой Российской Федерации, участник современных конфликтов</p>
+              </div>
+          </div>
+      </div>
+      
+      <div class="text-center mt-12">
+          <a href="/remember" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition duration-300 shadow-lg">
+              Все герои <i class="fas fa-arrow-right ml-2"></i>
+          </a>
+      </div>
+  </div>
+</section>
+
+<section class="py-20 px-4 md:px-12 bg-blue-900 bg-opacity-50">
+  <div class="container mx-auto">
+      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center hero-title">Мы помним</h2>
+      
+      <div class="max-w-4xl mx-auto bg-blue-800 bg-opacity-70 rounded-xl p-8 text-center">
+          <i class="fas fa-heart text-5xl text-red-400 mb-6"></i>
+          <h3 class="text-2xl font-bold mb-4">Сохраним память вместе</h3>
+          <p class="text-lg mb-6 text-blue-100">
+              Этот проект создан для сохранения памяти о героях, защищавших нашу Родину в разные периоды истории. 
+              Вы можете добавить информацию о своем герое, рассказать его историю и поделиться фотографиями.
+          </p>
+          <a href="/create" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition duration-300 shadow-lg">
+              Рассказать о герое <i class="fas fa-edit ml-2"></i>
+          </a>
+      </div>
+  </div>
+</section>
+{% endblock %}

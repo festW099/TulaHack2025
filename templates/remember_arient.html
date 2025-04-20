@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Память ветеранов</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231e3a8a' fill-opacity='0.05'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 47, 108, 0.1), 0 2px 4px -1px rgba(0, 47, 108, 0.06);
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 47, 108, 0.2), 0 4px 6px -2px rgba(0, 47, 108, 0.1);
+        }
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+        .ribbon {
+            position: absolute;
+            right: -5px; top: -5px;
+            z-index: 1;
+            overflow: hidden;
+            width: 75px; height: 75px;
+            text-align: right;
+        }
+        .ribbon span {
+            font-size: 10px;
+            font-weight: bold;
+            color: #FFF;
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 20px;
+            transform: rotate(45deg);
+            -webkit-transform: rotate(45deg);
+            width: 100px;
+            display: block;
+            background: #1e3a8a;
+            background: linear-gradient(#1e3a8a 0%, #3b82f6 100%);
+            box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+            position: absolute;
+            top: 19px; right: -21px;
+        }
+        .ribbon span::before {
+            content: "";
+            position: absolute; left: 0px; top: 100%;
+            z-index: -1;
+            border-left: 3px solid #1e3a8a;
+            border-right: 3px solid transparent;
+            border-bottom: 3px solid transparent;
+            border-top: 3px solid #1e3a8a;
+        }
+        .ribbon span::after {
+            content: "";
+            position: absolute; right: 0px; top: 100%;
+            z-index: -1;
+            border-left: 3px solid transparent;
+            border-right: 3px solid #1e3a8a;
+            border-bottom: 3px solid transparent;
+            border-top: 3px solid #1e3a8a;
+        }
+        .veteran-photo {
+            width: 220px;
+            height: 260px;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="hero-pattern">
+    <div class="container mx-auto px-4 py-12 max-w-6xl">
+        <!-- Шапка -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-blue-900 mb-2">Память поколений</h1>
+            <p class="text-blue-700 text-xl">Карточки памяти</p>
+            <div class="w-24 h-1 bg-blue-600 mx-auto mt-4 rounded-full"></div>
+        </div>
+        
+        <!-- Карточка ветерана -->
+        <div class="bg-white rounded-xl overflow-hidden card-shadow transition-all card-hover border border-blue-200 relative mb-12">
+            <!-- Основное содержимое -->
+            <div class="flex flex-col lg:flex-row p-6">
+                <!-- Фотография ветерана -->
+                <div class="flex justify-center lg:justify-start mb-6 lg:mb-0 lg:mr-8">
+                    <div class="veteran-photo bg-blue-100 rounded-lg overflow-hidden relative">
+                        <div class="absolute inset-0 flex items-center justify-center bg-blue-200">
+                            <i class="fas fa-user text-blue-400 text-6xl"></i>
+                        </div>
+                        <img src="https://via.placeholder.com/220x260/3b82f6/ffffff?text=Фото" 
+                             alt="Фото " 
+                             class="w-full h-full object-cover opacity-80 hover:opacity-100 transition-all">
+                    </div>
+                </div>
+                
+                <!-- Информация о ветеране -->
+                <div class="flex-1">
+                    <!-- ФИО и звание -->
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold text-blue-900 mb-1">Иванов Петр Сергеевич</h2>
+                    </div>
+                    
+                    <!-- Основные данные -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                            <h3 class="text-blue-700 text-sm font-medium mb-1">Дата рождения</h3>
+                            <p class="text-blue-900 font-medium">15 мая 1918 г.</p>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                            <h3 class="text-blue-700 text-sm font-medium mb-1">Место рождения</h3>
+                            <p class="text-blue-900 font-medium">
+                                <i class="fas fa-map-marker-alt text-blue-600 mr-2"></i> 
+                                с. Красное, Смоленская область
+                            </p>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                            <h3 class="text-blue-700 text-sm font-medium mb-1">Начало службы</h3>
+                            <p class="text-blue-900 font-medium">22 июня 1941 г.</p>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                            <h3 class="text-blue-700 text-sm font-medium mb-1">Окончание службы</h3>
+                            <p class="text-blue-900 font-medium">9 мая 1945 г.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Места боев -->
+                    <div class="mb-6">
+                        <h3 class="text-blue-700 text-lg font-medium mb-3 flex items-center">
+                            <i class="fas fa-map-marked-alt text-blue-600 mr-2"></i> Боевой путь
+                        </h3>
+                    </div>
+                    
+                    <!-- Награды -->
+                    <div class="mb-6">
+                        <h3 class="text-blue-700 text-lg font-medium mb-3 flex items-center">
+                            <i class="fas fa-medal text-blue-600 mr-2"></i> Награды
+                        </h3>
+                        <ul class="list-disc pl-5 text-blue-800 space-y-1">
+                            <li>Герой Советского Союза (1943)</li>
+                            <li>Орден Ленина (1942)</li>
+                            <li>Орден Красного Знамени (1941, 1944)</li>
+                            <li>Орден Отечественной войны I степени (1945)</li>
+                            <li>Медаль "За оборону Москвы" (1944)</li>
+                            <li>Медаль "За победу над Германией" (1945)</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Описание подвига -->
+                    <div>
+                        <h3 class="text-blue-700 text-lg font-medium mb-3 flex items-center">
+                            <i class="fas fa-scroll text-blue-600 mr-2"></i> Боевой путь и подвиги
+                        </h3>
+                        <p class="text-blue-800">
+                            Петр Сергеевич Иванов начал войну в звании лейтенанта, командира стрелкового взвода. 
+                            Отличился в боях под Москвой, где его взвод удерживал стратегически важную высоту 
+                            в течение трех дней, отразив 12 атак противника. В Сталинградской битве, будучи уже 
+                            капитаном, лично возглавил контратаку батальона, что позволило отбросить противника 
+                            с занимаемых позиций. В 1943 году за умелое командование полком в ходе Курской битвы 
+                            был удостоен звания Героя Советского Союза. Завершил войну в Берлине в звании гвардии 
+                            полковника.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="px-8 py-4 bg-blue-50 border-t border-blue-200 flex justify-between items-center">
+                <div class="text-blue-700 text-sm">
+                    <i class="fas fa-info-circle mr-1"></i> Вечная память героям
+                </div>
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-all text-sm">
+                    <i class="fas fa-share-alt mr-2"></i> Поделиться
+                </button>
+            </div>
+        </div>
+        
+        <!-- Вторая карточка (свернутая версия) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-white rounded-xl overflow-hidden card-shadow transition-all card-hover border border-blue-200">
+                <div class="h-48 bg-blue-100 relative">
+                    <img src="https://via.placeholder.com/600x400/3b82f6/ffffff?text=Фото" 
+                         alt="Фото ветерана" 
+                         class="w-full h-full object-cover opacity-80 hover:opacity-100 transition-all">
+                </div>
+                <div class="p-5">
+                    <h3 class="text-xl font-bold text-blue-900 mb-1">Смирнов Алексей Васильевич</h3>
+                    <p class="text-blue-700 text-sm mb-3">Гвардии майор</p>
+                    
+                    <div class="flex items-center text-blue-700 text-sm mb-2">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        <span>г. Тула</span>
+                    </div>
+                    
+                    <div class="flex items-center text-blue-700 text-sm mb-3">
+                        <i class="fas fa-calendar-alt mr-2"></i>
+                        <span>1941-1945</span>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-1 mb-3">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs">Орден Славы</span>
+                        <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs">Орден Красной Звезды</span>
+                    </div>
+                    
+                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-all text-sm mt-2">
+                        Подробнее
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card-hover');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.classList.add('shadow-lg');
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.classList.remove('shadow-lg');
+                });
+            });
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    if(this.textContent.trim() === 'Подробнее') {
+                        alert('Здесь будет открыта полная информация о ветеране');
+                    } else if(this.textContent.trim() === 'Поделиться') {
+                        alert('Функция "Поделиться" будет реализована в полной версии');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
