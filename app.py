@@ -3,6 +3,7 @@ import sqlite3
 import os
 import json
 from werkzeug.utils import secure_filename
+import base64
 
 app = Flask(__name__)
 secret_key = os.urandom(24).hex()
@@ -132,7 +133,7 @@ def create_hero():
             born_latitude = request.form.get('born_latitude', '0.0')
             born_longitude = request.form.get('born_longitude', '0.0')
             battle_locations = request.form.get('battle_locations', '[]')
-            locations = request.form.get('locations', '')  # Добавлено получение locations
+            locations = request.form.get('locations', '') 
             
             letter_photo_path = None
             if 'letter_photo' in request.files:
@@ -164,7 +165,7 @@ def create_hero():
                 battle_locations,
                 '',
                 letter_photo_path,
-                locations  # Добавлено значение для locations
+                locations 
             ))
             
             hero_id = cursor.lastrowid
@@ -273,10 +274,71 @@ def remember(id):
         map_data=json.dumps(map_data, ensure_ascii=False), user=session.get('user')
     )
 
+def get_all_heroes():
+    conn = sqlite3.connect('Data/heroes.db')
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT id, full_name, awards, letter, battles, photos, born,
+               year_start, year_end, born_latitude, born_longitude,
+               battle_locations
+        FROM heroes
+    """)
+    
+    columns = [column[0] for column in cursor.description]
+    all_data = cursor.fetchall()
+    conn.close()
+    
+    heroes_list = []
+    
+    def parse_json_field(value, default):
+        try:
+            return json.loads(value) if value else default
+        except (json.JSONDecodeError, TypeError):
+            return default
+    
+    for data in all_data:
+        data_dict = dict(zip(columns, data))
+        
+        data_dict['awards'] = parse_json_field(data_dict.get('awards'), [])
+        data_dict['photos'] = parse_json_field(data_dict.get('photos'), [])
+        data_dict['battle_locations'] = parse_json_field(data_dict.get('battle_locations'), [])
+        
+        try:
+            data_dict['born_latitude'] = float(data_dict.get('born_latitude', 0))
+        except (ValueError, TypeError):
+            data_dict['born_latitude'] = 0.0
+        
+        try:
+            data_dict['born_longitude'] = float(data_dict.get('born_longitude', 0))
+        except (ValueError, TypeError):
+            data_dict['born_longitude'] = 0.0
+        
+        heroes_list.append(data_dict)
+    
+    return heroes_list
+
 @app.route('/remember')
-def remember_search(id):
-    print(id)
-    return render_template("remember.html")
+def remember_search():
+    all_heroes = get_all_heroes()
+    
+    transformed_heroes = []
+    for hero in all_heroes:
+        transformed_hero = {
+            'id': hero['id'],
+            'name': hero['full_name'],
+            'warYears': f"{hero['year_start']}-{hero['year_end']}",
+            'birthPlace': hero['born'],
+            'warPlaces': hero.get('battle_locations', []),
+            'battles': hero.get('battles', ""),
+            'awards': hero.get('awards', []),
+            'photos': hero.get('photos', []),
+            'coords': [hero.get('born_latitude', 0), hero.get('born_longitude', 0)],
+            'warCoords': hero.get('battle_coordinates', [])
+        }
+        transformed_heroes.append(transformed_hero)
+    
+    return render_template("remember.html", mockHeroes=transformed_heroes, user=session.get('user'))
 
 if __name__ == '__main__':
     init_db()

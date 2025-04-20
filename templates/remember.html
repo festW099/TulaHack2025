@@ -3,7 +3,6 @@
 {% block title %}Герои России{% endblock %}
 
 {% block content %}
-
 <br><br><br>
 <!DOCTYPE html>
 <html lang="ru">
@@ -15,130 +14,29 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        #map, #warMap {
-            height: 400px;
-            width: 100%;
-            border-radius: 0.5rem;
-            z-index: 1;
+        body {
+            color: black;
         }
-        .hero-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-        .filter-section {
-            transition: all 0.3s ease;
-        }
-        .filter-section.collapsed {
-            max-height: 60px;
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-        }
-        .toggle-filter::after {
-            content: '+';
-            float: right;
-            transition: transform 0.3s;
-        }
-        .toggle-filter.collapsed::after {
-            transform: rotate(45deg);
-        }
-        .multiselect {
-            width: 100%;
-            position: relative;
-        }
-        .select-box {
-            position: relative;
-        }
-        .select-box select {
-            width: 100%;
-            font-weight: normal;
-        }
-        .over-select {
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-        }
-        #checkboxes {
-            display: none;
-            border: 1px solid #93c5fd;
-            border-radius: 0.5rem;
-            background: white;
-            position: absolute;
-            width: 100%;
-            z-index: 10;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        #checkboxes label {
-            display: block;
-            padding: 8px 12px;
-            cursor: pointer;
-        }
-        #checkboxes label:hover {
-            background-color: #dbeafe;
-        }
-        .selected-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-top: 4px;
-        }
-        .selected-item {
-            background-color: #3b82f6;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 9999px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-        }
-        .remove-item {
-            margin-left: 4px;
-            cursor: pointer;
-        }
-        .map-controls {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        .map-btn {
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 6px 12px;
-            cursor: pointer;
-            font-size: 14px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.2s;
-        }
-        .map-btn:hover {
-            background-color: #f8f9fa;
-        }
-        .map-btn.active {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #2563eb;
         }
     </style>
 </head>
 <body class="bg-blue-50 min-h-screen">
     <div class="container mx-auto px-4 py-8">
-        <!-- Заголовок -->
         <header class="text-center mb-10">
             <h1 class="text-4xl font-bold text-blue-800 mb-2" style="color: white;">Герои Российской войны</h1>
             <p class="text-xl text-blue-600" style="color: white;">1700 - настоящее время</p>
         </header>
 
-        <!-- Поисковая система -->
         <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-blue-200">
             <div class="flex flex-col md:flex-row gap-4 mb-6">
-                <!-- Основная строка поиска -->
                 <div class="flex-grow relative">
-                    <input type="text" id="searchInput" placeholder="Поиск по ФИО, наградам..."
-                            class="w-full pl-12 pr-4 py-3 rounded-lg border border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition">
+                    <input type="text" id="searchInput" placeholder="Поиск по ФИО, подвигам..."
+                            class="w-full pl-12 pr-4 py-3 rounded-lg border border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition" style="color: black;">
                     <div class="absolute left-3 top-3 text-blue-500">
                         <i class="fas fa-search text-xl"></i>
                     </div>
@@ -148,150 +46,9 @@
                 </button>
             </div>
 
-            <!-- Фильтры (сворачиваемые) -->
-            <div class="filter-section collapsed" id="filterSection">
-                <div class="border-t border-blue-200 pt-4">
-                    <h3 class="text-lg font-semibold text-blue-800 mb-4">Расширенные фильтры</h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                        <!-- Фильтр по годам войны -->
-                        <div>
-                            <label for="warYears" class="block text-sm font-medium text-blue-700 mb-1">Годы войны</label>
-                            <select id="warYears" class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:border-blue-500 outline-none" style="color: black;">
-                                <option value="" style="color: black;">Период не выбран</option>
-                                <option value="1700-1721" style="color: black;">Северная война (1700-1721)</option>
-                                <option value="1756-1763" style="color: black;">Семилетняя война (1756-1763)</option>
-                                <option value="1812-1814" style="color: black;">Отечественная война (1812-1814)</option>
-                                <option value="1853-1856" style="color: black;">Крымская война (1853-1856)</option>
-                                <option value="1914-1918" style="color: black;">Первая мировая война (1914-1918)</option>
-                                <option value="1941-1945" style="color: black;">Великая Отечественная война (1941-1945)</option>
-                                <option value="1979-1989" style="color: black;">Афганская война (1979-1989)</option>
-                                <option value="1994-1996" style="color: black;">Первая чеченская война (1994-1966)</option>
-                                <option value="1999-2009" style="color: black;">Вторая чеченская война (1999-2009)</option>
-                                <option value="2022" style="color: black;">Специальная военная операция (2022-н.в.)</option>
-                            </select>
-                        </div>
-
-                        <!-- Фильтр по наградам -->
-                        <div>
-                            <label for="awards" class="block text-sm font-medium text-blue-700 mb-1">Награды</label>
-                            <select id="awards" class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:border-blue-500 outline-none" style="color: black;">
-                                <option value="" style="color: black;">Награды не выбраны</option>
-                                <option value="Герой России" style="color: black;">Герой России</option>
-                                <option value="Герой Советского Союза" style="color: black;">Герой Советского Союза</option>
-                                <option value="Орден Святого Георгия" style="color: black;">Орден Святого Георгия</option>
-                                <option value="Орден Ленина" style="color: black;">Орден Ленина</option>
-                                <option value="Орден Красного Знамени" style="color: black;">Орден Красного Знамени</option>
-                                <option value="Орден Отечественной войны" style="color: black;">Орден Отечественной войны</option>
-                                <option value="Орден Александра Невского" style="color: black;">Орден Александра Невского</option>
-                                <option value="Орден Мужества" style="color: black;">Орден Мужества</option>
-                            </select>
-                        </div>
-
-                        <!-- Фильтр по месту рождения -->
-                        <div>
-                            <label for="birthPlace" class="block text-sm font-medium text-blue-700 mb-1">Место рождения</label>
-                            <input type="text" id="birthPlace" placeholder="Город, область..."
-                                    class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:border-blue-500 outline-none", style="color: black;">
-                        </div>
-
-                        <!-- Фильтр по месту войны (мультиселект) -->
-                        <div>
-                            <label class="block text-sm font-medium text-blue-700 mb-1">Места сражений</label>
-                            <div class="multiselect">
-                                <div class="select-box">
-                                    <select class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:border-blue-500 outline-none" multiple id="warPlacesSelect">
-                                        <option value="Москва" style="color: black;">Москва</option>
-                                        <option value="Санкт-Петербург" style="color: black;">Санкт-Петербург</option>
-                                        <option value="Сталинград" style="color: black;">Сталинград</option>
-                                        <option value="Курск" style="color: black;">Курск</option>
-                                        <option value="Севастополь" style="color: black;">Севастополь</option>
-                                        <option value="Берлин" style="color: black;">Берлин</option>
-                                        <option value="Киев" style="color: black;">Киев</option>
-                                        <option value="Минск" style="color: black;">Минск</option>
-                                        <option value="Кавказ" style="color: black;">Кавказ</option>
-                                        <option value="Донбасс" style="color: black;">Донбасс</option>
-                                    </select>
-                                    <div class="over-select" id="warPlacesToggle"></div>
-                                </div>
-                                <div id="warPlacesCheckboxes" class="checkboxes">
-                                    <label for="warPlaceMoscow">
-                                        <input type="checkbox" id="warPlaceMoscow" value="Москва" style="color: black;"> Москва
-                                    </label>
-                                    <label for="warPlaceSpb">
-                                        <input type="checkbox" id="warPlaceSpb" value="Санкт-Петербург" style="color: black;"> Санкт-Петербург
-                                    </label>
-                                    <label for="warPlaceStalingrad">
-                                        <input type="checkbox" id="warPlaceStalingrad" value="Сталинград" style="color: black;"> Сталинград
-                                    </label>
-                                    <label for="warPlaceKursk">
-                                        <input type="checkbox" id="warPlaceKursk" value="Курск" style="color: black;"> Курск
-                                    </label>
-                                    <label for="warPlaceSevastopol">
-                                        <input type="checkbox" id="warPlaceSevastopol" value="Севастополь" style="color: black;"> Севастополь
-                                    </label>
-                                    <label for="warPlaceBerlin">
-                                        <input type="checkbox" id="warPlaceBerlin" value="Берлин" style="color: black;"> Берлин
-                                    </label>
-                                    <label for="warPlaceKiev">
-                                        <input type="checkbox" id="warPlaceKiev" value="Киев" style="color: black;"> Киев
-                                    </label>
-                                    <label for="warPlaceMinsk">
-                                        <input type="checkbox" id="warPlaceMinsk" value="Минск" style="color: black;"> Минск
-                                    </label>
-                                    <label for="warPlaceCaucasus">
-                                        <input type="checkbox" id="warPlaceCaucasus" value="Кавказ" style="color: black;"> Кавказ
-                                    </label>
-                                    <label for="warPlaceDonbass">
-                                        <input type="checkbox" id="warPlaceDonbass" value="Донбасс" style="color: black;"> Донбасс
-                                    </label>
-                                </div>
-                                <div class="selected-items" id="warPlacesSelected"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Карты для выбора мест -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
-                        <div>
-                            <h4 class="text-md font-medium text-blue-800 mb-2 flex items-center">
-                                <i class="fas fa-map-marker-alt text-blue-600 mr-2"></i> Карта мест рождения
-                            </h4>
-                            <div id="map" class="border border-blue-200"></div>
-                            <p class="text-sm text-blue-600 mt-2">Отметьте область на карте для поиска героев</p>
-                        </div>
-                        <div>
-                            <h4 class="text-md font-medium text-blue-800 mb-2 flex items-center">
-                                <i class="fas fa-flag text-blue-600 mr-2"></i> Карта мест войны
-                            </h4>
-                            <div id="warMap" class="border border-blue-200"></div>
-                            <div class="map-controls">
-                                <button id="clearPointsBtn" class="map-btn" style="color: black;">
-                                    <i class="fas fa-trash" style="color: black;"></i> Очистить точки
-                                </button>
-                            </div>
-                            <p class="text-sm text-blue-600 mt-2">Отметьте область боевых действий</p>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end">
-                        <button id="applyFilters" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition">
-                            Применить фильтры
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Кнопка для сворачивания/разворачивания фильтров -->
-            <button id="toggleFilter" class="toggle-filter w-full text-left text-blue-700 font-medium py-2 px-4 rounded-lg hover:bg-blue-100 transition">
-                <i class="fas fa-filter mr-2"></i> Расширенные фильтры
-            </button>
-        </div>
-
-        <!-- Результаты поиска -->
         <div class="mb-8">
             <h2 class="text-2xl font-bold text-blue-800 mb-4 flex items-center" style="color: white;">
-                <i class="fas fa-users mr-2" style="color: white;"></i> Найдено героев: <span id="resultsCount" class="ml-2 text-blue-600" style="color: white;">0</span>
+                <i class="fas fa-users mr-2" style="color: white;"></i> Найдено героев: <span id="resultsCount" class="ml-2 text-blue-600" style="color: white;">{{ mockHeroes|length }}</span>
             </h2>
 
             <div id="loading" class="text-center py-10 hidden">
@@ -306,300 +63,137 @@
             </div>
 
             <div id="resultsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Карточки героев будут заполняться JavaScript -->
-            </div>
-
-            <!-- Пагинация -->
-            <div id="pagination" class="flex justify-center mt-8 hidden">
-                <nav class="inline-flex rounded-md shadow">
-                    <button class="px-3 py-2 rounded-l-md border border-blue-300 bg-white text-blue-600 hover:bg-blue-50">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button class="px-4 py-2 border-t border-b border-blue-300 bg-blue-600 text-white">1</button>
-                    <button class="px-4 py-2 border border-blue-300 bg-white text-blue-600 hover:bg-blue-50">2</button>
-                    <button class="px-4 py-2 border border-blue-300 bg-white text-blue-600 hover:bg-blue-50">3</button>
-                    <button class="px-3 py-2 rounded-r-md border border-blue-300 bg-white text-blue-600 hover:bg-blue-50">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </nav>
+                {% for hero in mockHeroes %}
+                <div class="hero-card bg-white rounded-xl shadow-md overflow-hidden border border-blue-100 transition duration-300" 
+                     data-name="{{ hero.name|lower }}"
+                     data-battles="{{ hero.battles|lower }}"
+                     data-years="{{ hero.warYears|lower }}"
+                     data-birthplace="{{ hero.birthPlace|lower }}"
+                     data-awards="{{ hero.awards|join(' ')|lower }}">
+                    <div class="h-48 bg-blue-600 flex items-center justify-center">
+                        <i class="fas fa-user-tie text-white text-6xl"></i>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-bold text-blue-800 mb-2">{{ hero.name }}</h3>
+                        <div class="flex items-center text-blue-600 mb-3">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            <span>{{ hero.warYears }}</span>
+                        </div>
+                        <div class="flex items-center text-blue-600 mb-3">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>Родился: {{ hero.birthPlace }}</span>
+                        </div>
+                        <div class="mb-4">
+                            <p class="text-gray-700 line-clamp-3 battles-text">{{ hero.battles }}</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            {% for award in hero.awards %}
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">{{ award }}</span>
+                            {% endfor %}
+                        </div>
+                        <button data-id="{{ hero.id }}" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition">
+                            Подробнее
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const birthMap = L.map('map').setView([55.7558, 37.6176], 5);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(birthMap);
+            const searchInput = document.getElementById('searchInput');
+            const searchButton = document.getElementById('searchButton');
+            const heroCards = document.querySelectorAll('.hero-card');
+            const resultsCount = document.getElementById('resultsCount');
+            const loadingElement = document.getElementById('loading');
+            const noResultsElement = document.getElementById('noResults');
+            const resultsContainer = document.getElementById('resultsContainer');
 
-            const birthMarkers = L.layerGroup().addTo(birthMap);
-
-            const warMap = L.map('warMap').setView([55.7558, 37.6176], 5);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(warMap);
-
-            const warMarkers = L.layerGroup().addTo(warMap);
-
-            const clearPointsBtn = document.getElementById('clearPointsBtn');
-
-            const addPointsMode = true;
-
-
-            clearPointsBtn.addEventListener('click', function() {
-                warMarkers.clearLayers();
-            });
-
-            birthMap.on('click', function(e) {
-                birthMarkers.clearLayers();
-                L.marker(e.latlng).addTo(birthMarkers)
-                    .bindPopup("Место рождения героя").openPopup();
-                document.getElementById('birthPlace').value = `${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
-            });
-
-            warMap.on('click', function(e) {
-                if (!addPointsMode) return;
-                
-                L.marker(e.latlng).addTo(warMarkers)
-                    .bindPopup("Место боевых действий").openPopup();
-            });
-
-            const toggleFilter = document.getElementById('toggleFilter');
-            const filterSection = document.getElementById('filterSection');
-
-            toggleFilter.addEventListener('click', function() {
-                filterSection.classList.toggle('collapsed');
-                toggleFilter.classList.toggle('collapsed');
-            });
-
-            const warPlacesToggle = document.getElementById('warPlacesToggle');
-            const warPlacesCheckboxes = document.getElementById('warPlacesCheckboxes');
-            const warPlacesSelected = document.getElementById('warPlacesSelected');
-            const warPlaceCheckboxInputs = warPlacesCheckboxes.querySelectorAll('input[type="checkbox"]');
-
-            let selectedWarPlaces = [];
-
-            warPlacesToggle.addEventListener('click', function(e) {
-                e.stopPropagation();
-                warPlacesCheckboxes.style.display = warPlacesCheckboxes.style.display === 'block' ? 'none' : 'block';
-            });
-
-            warPlaceCheckboxInputs.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    if (this.checked) {
-                        if (!selectedWarPlaces.includes(this.value)) {
-                            selectedWarPlaces.push(this.value);
-                        }
-                    } else {
-                        selectedWarPlaces = selectedWarPlaces.filter(item => item !== this.value);
-                    }
-                    updateSelectedWarPlaces();
+            document.querySelectorAll('.hero-card button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const heroId = this.getAttribute('data-id');
+                    window.location.href = `/remember/${heroId}`;
                 });
             });
-
-            function updateSelectedWarPlaces() {
-                warPlacesSelected.innerHTML = '';
-                selectedWarPlaces.forEach(place => {
-                    const item = document.createElement('div');
-                    item.className = 'selected-item';
-                    item.innerHTML = `
-                        ${place}
-                        <span class="remove-item" data-value="${place}">×</span>
-                    `;
-                    warPlacesSelected.appendChild(item);
-                });
-
-                document.querySelectorAll('.remove-item').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const value = this.getAttribute('data-value');
-                        selectedWarPlaces = selectedWarPlaces.filter(item => item !== value);
-                        warPlaceCheckboxInputs.forEach(checkbox => {
-                            if (checkbox.value === value) {
-                                checkbox.checked = false;
-                            }
-                        });
-                        updateSelectedWarPlaces();
-                    });
-                });
-            }
-
-            document.addEventListener('click', function() {
-                warPlacesCheckboxes.style.display = 'none';
-            });
-
-            const mockHeroes = [
-                {
-                    id: 1,
-                    name: "Александр Васильевич Суворов",
-                    warYears: "1756-1763, 1768-1774, 1787-1791, 1799",
-                    birthPlace: "Москва",
-                    warPlaces: ["Москва", "Санкт-Петербург", "Киев"],
-                    description: "Великий русский полководец, не проигравший ни одного сражения. Граф Рымникский, князь Италийский, генералиссимус российских сухопутных и морских сил.",
-                    awards: ["Орден Святого Георгия", "Орден Святого Владимира", "Орден Святого Александра Невского"],
-                    coords: [55.7558, 37.6176],
-                    warCoords: [50.4501, 30.5234]
-                },
-                {
-                    id: 2,
-                    name: "Михаил Илларионович Кутузов",
-                    warYears: "1768-1774, 1787-1791, 1805, 1812-1813",
-                    birthPlace: "Санкт-Петербург",
-                    warPlaces: ["Санкт-Петербург", "Москва", "Берлин"],
-                    description: "Прославленный полководец, генерал-фельдмаршал, главнокомандующий русской армией во время Отечественной войны 1812 года.",
-                    awards: ["Орден Святого Георгия", "Орден Святого Владимира", "Орден Святого Андрея Первозванного"],
-                    coords: [59.9343, 30.3351],
-                    warCoords: [55.5175, 35.8234]
-                },
-                {
-                    id: 3,
-                    name: "Георгий Константинович Жуков",
-                    warYears: "1914-1918, 1939, 1941-1945",
-                    birthPlace: "Стрелковка, Калужская губерния",
-                    warPlaces: ["Москва", "Сталинград", "Курск", "Берлин"],
-                    description: "Маршал Советского Союза, четырежды Герой Советского Союза. Один из главных творцов победы в Великой Отечественной войне.",
-                    awards: ["Герой Советского Союза", "Орден Ленина", "Орден Красного Знамени", "Орден Победы"],
-                    coords: [54.5293, 36.2754],
-                    warCoords: [55.7558, 37.6176]
-                },
-                {
-                    id: 4,
-                    name: "Константин Константинович Рокоссовский",
-                    warYears: "1914-1918, 1939, 1941-1945",
-                    birthPlace: "Великие Луки",
-                    warPlaces: ["Минск", "Сталинград", "Курск", "Берлин"],
-                    description: "Маршал Советского Союза и Польши, дважды Герой Советского Союза. Командовал Парадом Победы в 1945 году.",
-                    awards: ["Герой Советского Союза", "Орден Ленина", "Орден Красного Знамени", "Орден Победы"],
-                    coords: [56.3408, 30.5455],
-                    warCoords: [52.2297, 21.0122]
-                },
-                {
-                    id: 5,
-                    name: "Василий Иванович Чапаев",
-                    warYears: "1914-1918, 1917-1922",
-                    birthPlace: "Будайка, Чебоксарский уезд",
-                    warPlaces: ["Кавказ", "Донбасс"],
-                    description: "Легендарный командир Красной армии, участник Первой мировой и Гражданской войн. Народный герой.",
-                    awards: ["Георгиевский крест", "Орден Красного Знамени"],
-                    coords: [56.1466, 47.2327],
-                    warCoords: [51.6720, 39.1843]
-                },
-                {
-                    id: 6,
-                    name: "Алексей Петрович Маресьев",
-                    warYears: "1941-1945",
-                    birthPlace: "Камышин",
-                    warPlaces: ["Курск", "Москва"],
-                    description: "Легендарный летчик, Герой Советского Союза. После ампутации обеих ног вернулся в строй и сбил 7 самолетов.",
-                    awards: ["Герой Советского Союза", "Орден Ленина", "Орден Красного Знамени"],
-                    coords: [50.0983, 45.4160],
-                    warCoords: [55.7558, 37.6176]
-                }
-            ];
-
-            function displayResults(heroes) {
-                const container = document.getElementById('resultsContainer');
-                const countElement = document.getElementById('resultsCount');
-                const noResults = document.getElementById('noResults');
-                const loading = document.getElementById('loading');
-
-                loading.classList.add('hidden');
-                container.innerHTML = '';
-
-                if (heroes.length === 0) {
-                    noResults.classList.remove('hidden');
-                    countElement.textContent = '0';
-                    return;
-                }
-
-                noResults.classList.add('hidden');
-                countElement.textContent = heroes.length;
-
-                heroes.forEach(hero => {
-                    const card = document.createElement('div');
-                    card.className = 'hero-card bg-white rounded-xl shadow-md overflow-hidden border border-blue-100 transition duration-300';
-
-                    card.innerHTML = `
-                        <div class="h-48 bg-blue-600 flex items-center justify-center">
-                            <i class="fas fa-user-tie text-white text-6xl"></i>
-                        </div>
-                        <div class="p-5">
-                            <h3 class="text-xl font-bold text-blue-800 mb-2">${hero.name}</h3>
-                            <div class="flex items-center text-blue-600 mb-3">
-                                <i class="fas fa-calendar-alt mr-2"></i>
-                                <span>${hero.warYears}</span>
-                            </div>
-                            <div class="flex items-center text-blue-600 mb-3">
-                                <i class="fas fa-map-marker-alt mr-2"></i>
-                                <span>Родился: ${hero.birthPlace}</span>
-                            </div>
-                            <div class="flex items-center text-blue-600 mb-4">
-                                <i class="fas fa-flag mr-2"></i>
-                                <span>Участвовал: ${hero.warPlaces.join(', ')}</span>
-                            </div>
-                            <div class="mb-4">
-                                <p class="text-gray-700 line-clamp-3">${hero.description}</p>
-                            </div>
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                ${hero.awards.map(award => `<span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">${award}</span>`).join('')}
-                            </div>
-                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition">
-                                Подробнее
-                            </button>
-                        </div>
-                    `;
-
-                    container.appendChild(card);
-                });
-
-                if (heroes.length > 6) {
-                    document.getElementById('pagination').classList.remove('hidden');
-                } else {
-                    document.getElementById('pagination').classList.add('hidden');
-                }
-            }
 
             function performSearch() {
-                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-                const warYears = document.getElementById('warYears').value;
-                const awards = document.getElementById('awards').value;
-                const birthPlace = document.getElementById('birthPlace').value.toLowerCase();
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                let visibleCount = 0;
 
-                document.getElementById('loading').classList.remove('hidden');
+                loadingElement.classList.remove('hidden');
+                noResultsElement.classList.add('hidden');
+                resultsContainer.classList.add('opacity-50');
 
                 setTimeout(() => {
-                    const filtered = mockHeroes.filter(hero => {
-                        const matchesSearch = searchTerm === '' ||
-                               hero.name.toLowerCase().includes(searchTerm) ||
-                               hero.awards.some(a => a.toLowerCase().includes(searchTerm));
-                                                                                        
-                        const matchesWarYears = warYears === '' || hero.warYears.includes(warYears);
-                        const matchesAwards = awards === '' || hero.awards.includes(awards);
-                        const matchesBirthPlace = birthPlace === '' ||
-                               hero.birthPlace.toLowerCase().includes(birthPlace);
-                                                                    
-                        const matchesWarPlaces = selectedWarPlaces.length === 0 ||
-                               selectedWarPlaces.some(place => hero.warPlaces.includes(place));
+                    heroCards.forEach(card => {
+                        const cardData = {
+                            name: card.getAttribute('data-name'),
+                            battles: card.getAttribute('data-battles'),
+                            years: card.getAttribute('data-years'),
+                            birthplace: card.getAttribute('data-birthplace'),
+                            awards: card.getAttribute('data-awards')
+                        };
 
-                        return matchesSearch && matchesWarYears && matchesAwards &&
-                               matchesBirthPlace && matchesWarPlaces;
+                        const matches = Object.values(cardData).some(value => 
+                            value.includes(searchTerm)
+                        );
+
+                        if (matches || searchTerm === '') {
+                            card.classList.remove('hidden');
+                            visibleCount++;
+                            highlightMatches(card, searchTerm);
+                        } else {
+                            card.classList.add('hidden');
+                            removeHighlights(card);
+                        }
                     });
 
-                    displayResults(filtered);
-                }, 800);
+                    resultsCount.textContent = visibleCount;
+
+                    if (visibleCount === 0 && searchTerm !== '') {
+                        noResultsElement.classList.remove('hidden');
+                    }
+
+                    loadingElement.classList.add('hidden');
+                    resultsContainer.classList.remove('opacity-50');
+                }, 300);
             }
 
-            document.getElementById('searchButton').addEventListener('click', performSearch);
-            document.getElementById('applyFilters').addEventListener('click', performSearch);
+            function highlightMatches(card, term) {
+                if (term === '') return;
+                
+                const elements = card.querySelectorAll('h3, .battles-text, span:not(.bg-blue-100)');
+                
+                elements.forEach(element => {
+                    const text = element.textContent;
+                    const regex = new RegExp(term, 'gi');
+                    element.innerHTML = text.replace(regex, 
+                        match => `<span class="bg-yellow-200">${match}</span>`);
+                });
+            }
+            
+            function removeHighlights(card) {
+                const highlights = card.querySelectorAll('.bg-yellow-200');
+                highlights.forEach(highlight => {
+                    highlight.outerHTML = highlight.textContent;
+                });
+            }
 
-            document.getElementById('searchInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
+            searchButton.addEventListener('click', performSearch);
+            
+            searchInput.addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
                     performSearch();
                 }
             });
 
-            displayResults(mockHeroes);
+            searchInput.addEventListener('input', function() {
+                if (this.value.trim() === '') {
+                    performSearch();
+                }
+            });
         });
     </script>
 </body>
